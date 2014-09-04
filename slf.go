@@ -11,9 +11,9 @@ type MetaInformation struct {
 }
 
 type LogEntry struct {
-	IsPause boolean `xml:"IsPause"`
+	IsPause bool `xml:"IsPause"`
 	PauseTime int `xml:"PauseTime"`
-	IsWaypoint boolean `xml:"IsWaypoint"`
+	IsWaypoint bool `xml:"IsWaypoint"`
 	Title string `xml:"Title"`
 	Description string `xml:"Description"`
 	Rotations int `xml:"Rotations"`
