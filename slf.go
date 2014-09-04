@@ -1,7 +1,7 @@
 package main
 
 type GeneralInformation struct {
-	SerialNumber string `xml:"serialNumber,attr"`
+	SerialNumber int `xml:"serialNumber,attr"`
 	Unit string `xml:"unit,attr"`
 }
 
