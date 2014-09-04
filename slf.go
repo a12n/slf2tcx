@@ -3,6 +3,7 @@ package main
 type GeneralInformation struct {
 	SerialNumber int `xml:"serialNumber,attr"`
 	Unit string `xml:"unit,attr"`
+	// TODO
 }
 
 type MetaInformation struct {
