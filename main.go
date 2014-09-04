@@ -20,19 +20,23 @@ func decodeFile(name string, v interface{}) {
 }
 
 func main() {
-	// var slf *Log
-	// var gpx *Gpx
-	// var tcx *Tcx
+	var slf *Log
+	var gpx *Gpx
+	var tcx *Tcx
 	switch len(os.Args) {
 	case 3:
-		// slf = new(Log)
-		// tcx = new(Tcx)
+		tcx = new(Tcx)
 	case 4:
-		// slf = new(Log)
-		// gpx = new(Gpx)
-		// tcx = new(Tcx)
+		gpx = new(Gpx)
+		decodeFile(os.Args[2], gpx)
+		tcx = new(Tcx)
 	default:
 		fmt.Fprint(os.Stderr, "Usage: ", os.Args[0], " input.slf [replace_trk.gpx] output.tcx\n")
 		os.Exit(1)
 	}
+	slf = new(Log)
+	decodeFile(os.Args[1], slf)
+	fmt.Printf("slf: %+v\n", slf)
+	fmt.Printf("gpx: %+v\n", gpx)
+	fmt.Printf("tcx: %+v\n", tcx)
 }
