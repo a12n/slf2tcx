@@ -11,27 +11,27 @@ type MetaInformation struct {
 }
 
 type LogEntry struct {
-	IsPause bool `xml:"IsPause"`
-	PauseTime int `xml:"PauseTime"`
-	IsWaypoint bool `xml:"IsWaypoint"`
-	Title string `xml:"Title"`
-	Description string `xml:"Description"`
-	Rotations int `xml:"Rotations"`
-	RelativeRotations int `xml:"RelativeRotations"`
-	Speed float64 `xml:"Speed"`
-	Heartrate int `xml:"Heartrate"`
-	Altitude float64 `xml:"Altitude"`
-	Temperature int `xml:"Temperature"`
-	RideTime float64 `xml:"RideTime"`
-	Distance float64 `xml:"Distance"`
-	Incline float64 `xml:"Incline"`
-	RiseRate float64 `xml:"RiseRate"`
-	DistanceDownhill float64 `xml:"DistanceDownhill"`
-	DistanceUphill float64 `xml:"DistanceUphill"`
-	AltitudeDifferenceDownhill float64 `xml:"AltitudeDifferenceDownhill"`
-	AltitudeDifferenceUphill float64 `xml:"AltitudeDifferenceUphill"`
-	RideTimeUphill float64 `xml:"RideTimeUphill"`
-	RideTimeDownhill float64 `xml:"RideTimeDownhill"`
+	IsPause bool
+	PauseTime int
+	IsWaypoint bool
+	Title string
+	Description string
+	Rotations int
+	RelativeRotations int
+	Speed float64
+	Heartrate int
+	Altitude float64
+	Temperature int
+	RideTime float64
+	Distance float64
+	Incline float64
+	RiseRate float64
+	DistanceDownhill float64
+	DistanceUphill float64
+	AltitudeDifferenceDownhill float64
+	AltitudeDifferenceUphill float64
+	RideTimeUphill float64
+	RideTimeDownhill float64
 }
 
 type LogValues struct {
@@ -39,13 +39,13 @@ type LogValues struct {
 }
 
 type LogEntries struct {
-	LogEntry []LogEntry `xml:"LogEntry"`
+	LogEntry []LogEntry
 }
 
 type Log struct {
 	Revision int `xml:"revision,attr"`
-	GeneralInformation GeneralInformation `xml:"GeneralInformation"`
-	MetaInformation MetaInformation `xml:"MetaInformation"`
-	LogValues LogValues `xml:"LogValues"`
-	LogEntries LogEntries `xml:"LogEntries"`
+	GeneralInformation GeneralInformation
+	MetaInformation MetaInformation
+	LogValues LogValues
+	LogEntries LogEntries
 }
