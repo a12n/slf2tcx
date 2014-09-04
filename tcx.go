@@ -1,3 +1,5 @@
 package main
 
-// TODO
+type Tcx struct {
+	// TODO
+}
