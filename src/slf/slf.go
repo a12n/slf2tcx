@@ -175,3 +175,13 @@ type Log struct {
 	LogEntries LogEntries
 	Markers Markers
 }
+
+type LogEntryArray []LogEntry
+func (a LogEntryArray) Len() int { return len(a) }
+func (a LogEntryArray) Less(i, j int) bool { return a[i].Number < a[j].Number }
+func (a LogEntryArray) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+type MarkerArray []Marker
+func (a MarkerArray) Len() int { return len(a) }
+func (a MarkerArray) Less(i, j int) bool { return a[i].TimeAbsolute < a[j].TimeAbsolute }
+func (a MarkerArray) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
