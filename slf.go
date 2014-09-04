@@ -7,5 +7,6 @@ type GeneralInformation struct {
 
 type Log struct {
 	Revision int `xml:"revision,attr"`
+	GeneralInformation GeneralInformation `xml:"GeneralInformation"`
 	// TODO
 }
