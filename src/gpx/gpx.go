@@ -1,6 +1,8 @@
 package gpx
 
 import (
+	"encoding/xml"
+	"os"
 	"time"
 )
 
@@ -70,4 +72,19 @@ type Gpx struct {
 	Wpt []*Wpt `xml:"wpt"`
 	// Rte []*Rte `xml:"rte"`
 	Trk []*Trk `xml:"trk"`
+}
+
+func Load(path string) (*Gpx, error) {
+	// FIXME: duplicates slf.Load
+	var err error
+	var file *os.File
+	if file, err = os.Open(path); err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	var ans *Gpx = new(Gpx)
+	if err = xml.NewDecoder(file).Decode(ans); err != nil {
+		return nil, err
+	}
+	return ans, nil
 }
