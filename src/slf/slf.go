@@ -1,6 +1,8 @@
 package slf
 
-import "time"
+import (
+	// "time"
+)
 
 // Sigma Log File, revision 3xx (Sigma Data Center v3.x)
 
@@ -39,7 +41,7 @@ type GeneralInformation struct {
 	LogType string `xml:"logType,attr"`
 	// FileDate
 	Name string
-	StartDate time.Time
+	StartDate string			// must be time.Time
 	// DateCode
 	SamplingRate float64		// s
 	WheelSize float64			// mm
