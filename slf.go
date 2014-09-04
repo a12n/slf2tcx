@@ -7,7 +7,16 @@ type GeneralInformation struct {
 }
 
 type MetaInformation struct {
-	// TODO
+	Statistic bool
+	Notes string
+	Rating int
+	Weather int
+	Wind int
+	Profile int
+	// Participant
+	TrainingType string
+	ExternalLink string
+	Temperature int
 }
 
 type LogEntry struct {
