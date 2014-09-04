@@ -1,4 +1,4 @@
-package main
+package tcx
 
 type Tcx struct {
 	// TODO
