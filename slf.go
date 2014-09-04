@@ -20,7 +20,7 @@ type LogEntry struct {
 	RelativeRotations int `xml:"RelativeRotations"`
 	Speed float64 `xml:"Speed"`
 	Heartrate int `xml:"Heartrate"`
-	Altitude int `xml:"Altitude"`
+	Altitude float64 `xml:"Altitude"`
 	Temperature int `xml:"Temperature"`
 	RideTime float64 `xml:"RideTime"`
 	Distance float64 `xml:"Distance"`
