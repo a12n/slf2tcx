@@ -1,5 +1,5 @@
 package tcx
 
-type Tcx struct {
+type TrainingCenterDatabase struct {
 	// TODO
 }
