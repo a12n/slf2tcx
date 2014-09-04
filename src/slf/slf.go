@@ -1,6 +1,9 @@
 package slf
 
 import (
+	"encoding/xml"
+	"os"
+	"sort"
 	// "time"
 )
 
@@ -176,12 +179,29 @@ type Log struct {
 	Markers Markers
 }
 
-type LogEntryArray []LogEntry
-func (a LogEntryArray) Len() int { return len(a) }
-func (a LogEntryArray) Less(i, j int) bool { return a[i].Number < a[j].Number }
-func (a LogEntryArray) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+type logEntryArray []LogEntry
+func (a logEntryArray) Len() int { return len(a) }
+func (a logEntryArray) Less(i, j int) bool { return a[i].Number < a[j].Number }
+func (a logEntryArray) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type MarkerArray []Marker
-func (a MarkerArray) Len() int { return len(a) }
-func (a MarkerArray) Less(i, j int) bool { return a[i].TimeAbsolute < a[j].TimeAbsolute }
-func (a MarkerArray) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+type markerArray []Marker
+func (a markerArray) Len() int { return len(a) }
+func (a markerArray) Less(i, j int) bool { return a[i].TimeAbsolute < a[j].TimeAbsolute }
+func (a markerArray) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+func Load(path string) (*Log, error) {
+	// FIXME: duplicates gpx.Load
+	var err error
+	var file *os.File
+	if file, err = os.Open(path); err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	var ans *Log = new(Log)
+	if err = xml.NewDecoder(file).Decode(ans); err != nil {
+		return nil, err
+	}
+	sort.Sort(logEntryArray(ans.LogEntries.LogEntry))
+	sort.Sort(markerArray(ans.Markers.Marker))
+	return ans, nil
+}
