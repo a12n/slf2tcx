@@ -5,6 +5,10 @@ type GeneralInformation struct {
 	Unit string `xml:"unit,attr"`
 }
 
+type MetaInformation struct {
+	// TODO
+}
+
 type Log struct {
 	Revision int `xml:"revision,attr"`
 	GeneralInformation GeneralInformation `xml:"GeneralInformation"`
