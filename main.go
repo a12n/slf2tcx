@@ -6,15 +6,15 @@ import (
 )
 
 func main() {
-	// var slf *Slf
+	// var slf *Log
 	// var gpx *Gpx
 	// var tcx *Tcx
 	switch len(os.Args) {
 	case 3:
-		// slf = new(Slf)
+		// slf = new(Log)
 		// tcx = new(Tcx)
 	case 4:
-		// slf = new(Slf)
+		// slf = new(Log)
 		// gpx = new(Gpx)
 		// tcx = new(Tcx)
 	default:

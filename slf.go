@@ -1,5 +1,5 @@
 package main
 
-type Slf struct {
+type Log struct {
 	// TODO
 }
