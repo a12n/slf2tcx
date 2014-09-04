@@ -1,9 +1,23 @@
 package main
 
 import (
+	"encoding/xml"
 	"fmt"
+	"log"
 	"os"
 )
+
+func decodeFile(name string, v interface{}) {
+	var err error
+	var file *os.File
+	if file, err = os.Open(name); err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+	if err = xml.NewDecoder(file).Decode(v); err != nil {
+		log.Fatal(err)
+	}
+}
 
 func main() {
 	// var slf *Log
