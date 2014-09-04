@@ -177,17 +177,3 @@ type Log struct {
 	LogEntries LogEntries
 	Markers Markers
 }
-
-func Load(path string) (*Log, error) {
-	var err error
-	var file *os.File
-	if file, err = os.Open(path); err != nil {
-		return nil, err
-	}
-	defer file.Close()
-	var ans *Log = new(Log)
-	if err = xml.NewDecoder(file).Decode(ans); err != nil {
-		return nil, err
-	}
-	return ans, nil
-}
