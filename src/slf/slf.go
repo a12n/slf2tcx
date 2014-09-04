@@ -1,10 +1,6 @@
 package slf
 
-import (
-	"encoding/xml"
-	"os"
-	"time"
-)
+import "time"
 
 // Sigma Log File, revision 3xx (Sigma Data Center v3.x)
 
