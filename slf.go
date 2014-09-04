@@ -35,7 +35,11 @@ type LogEntry struct {
 }
 
 type LogValues struct {
-	LogEntry []*LogEntry `xml:"LogEntry"`
+	// TODO
+}
+
+type LogEntries struct {
+	LogEntry []LogEntry `xml:"LogEntry"`
 }
 
 type Log struct {
@@ -43,4 +47,5 @@ type Log struct {
 	GeneralInformation GeneralInformation `xml:"GeneralInformation"`
 	MetaInformation MetaInformation `xml:"MetaInformation"`
 	LogValues LogValues `xml:"LogValues"`
+	LogEntries LogEntries `xml:"LogEntries"`
 }
