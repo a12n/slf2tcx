@@ -12,5 +12,6 @@ type MetaInformation struct {
 type Log struct {
 	Revision int `xml:"revision,attr"`
 	GeneralInformation GeneralInformation `xml:"GeneralInformation"`
+	MetaInformation MetaInformation `xml:"MetaInformation"`
 	// TODO
 }
