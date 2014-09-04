@@ -18,20 +18,20 @@ type LogEntry struct {
 	Description string `xml:"Description"`
 	Rotations int `xml:"Rotations"`
 	RelativeRotations int `xml:"RelativeRotations"`
-	Speed double `xml:"Speed"`
+	Speed float64 `xml:"Speed"`
 	Heartrate int `xml:"Heartrate"`
 	Altitude int `xml:"Altitude"`
 	Temperature int `xml:"Temperature"`
-	RideTime double `xml:"RideTime"`
-	Distance double `xml:"Distance"`
-	Incline double `xml:"Incline"`
-	RiseRate double `xml:"RiseRate"`
-	DistanceDownhill double `xml:"DistanceDownhill"`
-	DistanceUphill double `xml:"DistanceUphill"`
-	AltitudeDifferenceDownhill double `xml:"AltitudeDifferenceDownhill"`
-	AltitudeDifferenceUphill double `xml:"AltitudeDifferenceUphill"`
-	RideTimeUphill double `xml:"RideTimeUphill"`
-	RideTimeDownhill double `xml:"RideTimeDownhill"`
+	RideTime float64 `xml:"RideTime"`
+	Distance float64 `xml:"Distance"`
+	Incline float64 `xml:"Incline"`
+	RiseRate float64 `xml:"RiseRate"`
+	DistanceDownhill float64 `xml:"DistanceDownhill"`
+	DistanceUphill float64 `xml:"DistanceUphill"`
+	AltitudeDifferenceDownhill float64 `xml:"AltitudeDifferenceDownhill"`
+	AltitudeDifferenceUphill float64 `xml:"AltitudeDifferenceUphill"`
+	RideTimeUphill float64 `xml:"RideTimeUphill"`
+	RideTimeDownhill float64 `xml:"RideTimeDownhill"`
 }
 
 type LogValues struct {
