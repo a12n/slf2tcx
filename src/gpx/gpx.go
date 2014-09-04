@@ -1,6 +1,8 @@
-package main
+package gpx
 
-import "time"
+import (
+	"time"
+)
 
 type Email struct {
 	Id string `xml:"id,attr"`
