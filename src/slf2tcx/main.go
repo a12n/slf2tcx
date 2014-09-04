@@ -1,57 +1,48 @@
 package main
 
 import (
-	"encoding/xml"
 	"fmt"
 	"gpx"
 	"log"
 	"os"
 	"slf"
-	"sort"
 	"tcx"
 )
 
-func Load(path string, ans interface{}) {
-	var err error
-	var file *os.File
-	if file, err = os.Open(path); err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-	if err = xml.NewDecoder(file).Decode(ans); err != nil {
-		log.Fatal(err)
-	}
-}
-
-func LoadSlf(path string) *slf.Log {
-	ans := new(slf.Log)
-	Load(path, ans)
-	sort.Sort(slf.LogEntryArray(ans.LogEntries.LogEntry))
-	sort.Sort(slf.MarkerArray(ans.Markers.Marker))
-	return ans
-}
-
-func LoadGpx(path string) *gpx.Gpx {
-	ans := new(gpx.Gpx)
-	Load(path, ans)
-	return ans
-}
-
 func main() {
-	var slf *slf.Log
-	var gpx *gpx.Gpx
-	var tcx *tcx.TrainingCenterDatabase = new(tcx.TrainingCenterDatabase)
+	var workoutPath string
+	var trackPath string
+	var ansPath string
 	switch len(os.Args) {
 	case 3:
-		slf = LoadSlf(os.Args[1])
+		workoutPath = os.Args[1]
+		ansPath = os.Args[2]
 	case 4:
-		slf = LoadSlf(os.Args[1])
-		gpx = LoadGpx(os.Args[2])
+		workoutPath = os.Args[1]
+		trackPath = os.Args[2]
+		ansPath = os.Args[3]
 	default:
 		fmt.Fprint(os.Stderr, "Usage: ", os.Args[0], " input.slf [replace_trk.gpx] output.tcx\n")
 		os.Exit(1)
 	}
-	fmt.Printf("slf: %#v\n", slf)
-	fmt.Printf("gpx: %#v\n", gpx)
-	fmt.Printf("tcx: %#v\n", tcx)
+	var ans *tcx.TrainingCenterDatabase = new(tcx.TrainingCenterDatabase)
+	var track *gpx.Gpx
+	var workout *slf.Log
+	var err error
+	// Load SLF workout
+	if workout, err = slf.Load(workoutPath); err != nil {
+		log.Fatal(err)
+	}
+	ans.AddSlf(workout)
+	// Load GPX track
+	if trackPath != "" {
+		if track, err = gpx.Load(trackPath); err != nil {
+			log.Fatal(err)
+		}
+		ans.AddGpx(track)
+	}
+	// Save TCX
+	if err = ans.Save(ansPath); err != nil {
+		log.Fatal(err)
+	}
 }
