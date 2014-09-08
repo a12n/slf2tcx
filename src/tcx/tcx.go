@@ -9,11 +9,11 @@ type TrainingCenterDatabase struct {
 	xmlns string `xml:"xmlns,attr"`
 }
 
-func (t *TrainingCenterDatabase) AddSlf(s *slf.Log) {
+func (t *TrainingCenterDatabase) FromLog(s *slf.Log) {
 	// TODO
 }
 
-func (t *TrainingCenterDatabase) AddGpx(s *gpx.Gpx) {
+func (t *TrainingCenterDatabase) ReplaceTrack(s *gpx.Gpx) {
 	// TODO
 }
 

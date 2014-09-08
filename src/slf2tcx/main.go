@@ -33,13 +33,13 @@ func main() {
 	if workout, err = slf.Load(workoutPath); err != nil {
 		log.Fatal(err)
 	}
-	ans.AddSlf(workout)
+	ans.FromLog(workout)
 	// Load GPX track
 	if trackPath != "" {
 		if track, err = gpx.Load(trackPath); err != nil {
 			log.Fatal(err)
 		}
-		ans.AddGpx(track)
+		ans.ReplaceTrack(track)
 	}
 	// Save TCX
 	if err = ans.Save(ansPath); err != nil {
