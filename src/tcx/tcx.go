@@ -17,6 +17,7 @@ func (t *TrainingCenterDatabase) FromLog(s *slf.Log) {
 
 func (t *TrainingCenterDatabase) ReplaceTrack(track *gpx.Gpx) error {
 	// TODO
+	return nil
 }
 
 func (t *TrainingCenterDatabase) Save(path string) error {
