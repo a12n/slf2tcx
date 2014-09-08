@@ -28,7 +28,9 @@ func (t *TrainingCenterDatabase) Save(path string) error {
 		return err
 	}
 	defer file.Close()
-	if err = xml.NewEncoder(file).Encode(t); err != nil {
+	var encoder *xml.Encoder = xml.NewEncoder(file)
+	encoder.Indent("", "\t")
+	if err = encoder.Encode(t); err != nil {
 		return err
 	}
 	return nil
