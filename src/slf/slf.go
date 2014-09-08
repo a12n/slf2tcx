@@ -181,19 +181,16 @@ func (a markerArray) Len() int { return len(a) }
 func (a markerArray) Less(i, j int) bool { return a[i].TimeAbsolute < a[j].TimeAbsolute }
 func (a markerArray) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-func Load(path string) (*Log, error) {
+func Load(path string) (ans *Log, err error) {
 	// FIXME: duplicates gpx.Load
-	var err error
 	var file *os.File
-	if file, err = os.Open(path); err != nil {
-		return nil, err
+	if file, err = os.Open(path); err == nil {
+		defer file.Close()
+		ans = new(Log)
+		if err = xml.NewDecoder(file).Decode(ans); err == nil {
+			sort.Sort(logEntryArray(ans.LogEntry))
+			sort.Sort(markerArray(ans.Marker))
+		}
 	}
-	defer file.Close()
-	var ans *Log = new(Log)
-	if err = xml.NewDecoder(file).Decode(ans); err != nil {
-		return nil, err
-	}
-	sort.Sort(logEntryArray(ans.LogEntry))
-	sort.Sort(markerArray(ans.Marker))
-	return ans, nil
+	return
 }
