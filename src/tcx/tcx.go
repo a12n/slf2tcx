@@ -69,7 +69,7 @@ type Activity struct {
 
 type TrainingCenterDatabase struct {
 	XMLName xml.Name `xml:"http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 TrainingCenterDatabase"`
-	Activities []Activity `xml:"Activities>Activity"`
+	Activity []Activity `xml:"Activities>Activity"`
 }
 
 // func Load(path string) (*TrainingCenterDatabase, error) {
