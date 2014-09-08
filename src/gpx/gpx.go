@@ -74,17 +74,13 @@ type Gpx struct {
 	Trk []*Trk `xml:"trk"`
 }
 
-func Load(path string) (*Gpx, error) {
+func Load(path string) (ans *Gpx, err error) {
 	// FIXME: duplicates slf.Load
-	var err error
 	var file *os.File
-	if file, err = os.Open(path); err != nil {
-		return nil, err
+	if file, err = os.Open(path); err == nil {
+		defer file.Close()
+		ans = new(Gpx)
+		err = xml.NewDecoder(file).Decode(ans)
 	}
-	defer file.Close()
-	var ans *Gpx = new(Gpx)
-	if err = xml.NewDecoder(file).Decode(ans); err != nil {
-		return nil, err
-	}
-	return ans, nil
+	return
 }
