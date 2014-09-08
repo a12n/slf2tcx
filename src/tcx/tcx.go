@@ -21,6 +21,10 @@ const (
 	// SensorState field in Trackpoint
 	Present = "Present"
 	Absent = "Absent"
+	// Sport attr in Activity
+	Running = "Running"
+	Biking = "Biking"
+	Other = "Other"
 )
 
 type Position struct {
