@@ -60,7 +60,7 @@ type GeneralInformation struct {
 	SerialNumber int `xml:"serialNumber,attr"`
 	Unit string `xml:"unit,attr"`
 	LogType string `xml:"logType,attr"`
-	// FileDate
+	FileDate SigmaTime
 	Name string
 	StartDate SigmaTime
 	// DateCode
