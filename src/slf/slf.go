@@ -138,10 +138,6 @@ type LogValues struct {
 	AltitudeDifferencesDownhill float64 // mm
 }
 
-type LogEntries struct {
-	LogEntry []LogEntry
-}
-
 type Marker struct {
 	MarkerType string			// ?
 	MarkerNumber int
@@ -165,18 +161,14 @@ type Marker struct {
 	// Downhill
 }
 
-type Markers struct {
-	Marker []Marker
-}
-
 type Log struct {
 	Revision int `xml:"revision,attr"`
 	GeneralInformation GeneralInformation
 	MetaInformation MetaInformation
 	// EncodedData
 	LogValues LogValues
-	LogEntries LogEntries
-	Markers Markers
+	LogEntry []LogEntry `xml:"LogEntries>LogEntry"`
+	Marker []Marker `xml:"Markers>Marker"`
 }
 
 type logEntryArray []LogEntry
