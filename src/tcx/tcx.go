@@ -11,8 +11,9 @@ type TrainingCenterDatabase struct {
 	xmlns string `xml:"xmlns,attr"`
 }
 
-func (t *TrainingCenterDatabase) FromLog(s *slf.Log) {
+func FromLog(log *slf.Log) (*TrainingCenterDatabase, error) {
 	// TODO
+	return new(TrainingCenterDatabase), nil
 }
 
 func (t *TrainingCenterDatabase) ReplaceTrack(track *gpx.Gpx) error {
