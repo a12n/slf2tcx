@@ -30,8 +30,8 @@ end
 
 class TrainingCenterDatabase
   include HappyMapper
-  register_namespace 'tcx2', 'http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2'
-  namespace 'tcx2'
+  register_namespace 'tcx', 'http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2'
+  namespace 'tcx'
   tag 'TrainingCenterDatabase'
 end
 
