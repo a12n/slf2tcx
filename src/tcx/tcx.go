@@ -15,7 +15,7 @@ func (t *TrainingCenterDatabase) FromLog(s *slf.Log) {
 	// TODO
 }
 
-func (t *TrainingCenterDatabase) ReplaceTrack(s *gpx.Gpx) {
+func (t *TrainingCenterDatabase) ReplaceTrack(track *gpx.Gpx) error {
 	// TODO
 }
 
