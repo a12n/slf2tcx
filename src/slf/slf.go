@@ -193,7 +193,7 @@ func Load(path string) (*Log, error) {
 	if err = xml.NewDecoder(file).Decode(ans); err != nil {
 		return nil, err
 	}
-	sort.Sort(logEntryArray(ans.LogEntries.LogEntry))
-	sort.Sort(markerArray(ans.Markers.Marker))
+	sort.Sort(logEntryArray(ans.LogEntry))
+	sort.Sort(markerArray(ans.Marker))
 	return ans, nil
 }
