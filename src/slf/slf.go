@@ -94,7 +94,7 @@ type LogEntry struct {
 	AltitudeDifferenceUphill float64   // mm?
 	RideTimeUphill int				   // s
 	RideTimeDownhill int			   // s
-	Cadence float64					   // rpm
+	Cadence int						   // rpm
 	// IntensityZone
 	// TargetZone
 	Calories float64			// kcal
