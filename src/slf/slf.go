@@ -4,8 +4,26 @@ import (
 	"encoding/xml"
 	"os"
 	"sort"
-	// "time"
+	"time"
 )
+
+type SigmaTime struct {
+	time.Time
+}
+
+func (t *SigmaTime) UnmarshalXML(decoder *xml.Decoder, start xml.StartElement) (err error) {
+	var v string
+	var x time.Time
+	decoder.DecodeElement(&v, &start)
+	if x, err = time.Parse("Mon Jan _2 15:04:05 GMT-0700 2006", v); err == nil {
+		// Ignore time zone from the device, use local time zone
+		t.Time = time.Date(
+			x.Year(), x.Month(), x.Day(),
+			x.Hour(), x.Minute(), x.Second(), x.Nanosecond(),
+			time.Local)
+	}
+	return
+}
 
 // Sigma Log File, revision 3xx (Sigma Data Center v3.x)
 
@@ -44,7 +62,7 @@ type GeneralInformation struct {
 	LogType string `xml:"logType,attr"`
 	// FileDate
 	Name string
-	StartDate string			// must be time.Time
+	StartDate SigmaTime
 	// DateCode
 	SamplingRate float64		// s
 	WheelSize float64			// mm
