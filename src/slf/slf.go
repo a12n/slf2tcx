@@ -171,15 +171,15 @@ type Log struct {
 	Marker []Marker `xml:"Markers>Marker"`
 }
 
-type logEntryArray []LogEntry
-func (a logEntryArray) Len() int { return len(a) }
-func (a logEntryArray) Less(i, j int) bool { return a[i].Number < a[j].Number }
-func (a logEntryArray) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+type byNumber []LogEntry
+func (a byNumber) Len() int { return len(a) }
+func (a byNumber) Less(i, j int) bool { return a[i].Number < a[j].Number }
+func (a byNumber) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type markerArray []Marker
-func (a markerArray) Len() int { return len(a) }
-func (a markerArray) Less(i, j int) bool { return a[i].TimeAbsolute < a[j].TimeAbsolute }
-func (a markerArray) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+type byTimeAbsolute []Marker
+func (a byTimeAbsolute) Len() int { return len(a) }
+func (a byTimeAbsolute) Less(i, j int) bool { return a[i].TimeAbsolute < a[j].TimeAbsolute }
+func (a byTimeAbsolute) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 func Load(path string) (ans *Log, err error) {
 	// FIXME: duplicates gpx.Load
@@ -188,8 +188,8 @@ func Load(path string) (ans *Log, err error) {
 		defer file.Close()
 		ans = new(Log)
 		if err = xml.NewDecoder(file).Decode(ans); err == nil {
-			sort.Sort(logEntryArray(ans.LogEntry))
-			sort.Sort(markerArray(ans.Marker))
+			sort.Sort(byNumber(ans.LogEntry))
+			sort.Sort(byTimeAbsolute(ans.Marker))
 		}
 	}
 	return
