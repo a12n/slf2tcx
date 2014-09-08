@@ -96,7 +96,7 @@ func (t *TrainingCenterDatabase) ReplaceTrack(track *gpx.Gpx) error {
 
 func (t *TrainingCenterDatabase) Save(path string) (err error) {
 	var file *os.File
-	if file, err = os.Create(path); err != nil {
+	if file, err = os.Create(path); err == nil {
 		defer file.Close()
 		var encoder *xml.Encoder = xml.NewEncoder(file)
 		encoder.Indent("", "\t")
