@@ -54,6 +54,8 @@ const (
 	// MarkerType in Marker
 	Lap = "l"
 	Pause = "p"
+	// LogType in GeneralInformation
+	Cycling = "Cycling"
 )
 
 type GeneralInformation struct {
