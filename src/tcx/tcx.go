@@ -88,9 +88,48 @@ type TrainingCenterDatabase struct {
 // 	return ans, nil
 // }
 
-func FromLog(log *slf.Log) (*TrainingCenterDatabase, error) {
-	// TODO
-	return new(TrainingCenterDatabase), nil
+func FromLog(log *slf.Log) (ans *TrainingCenterDatabase, err error) {
+	ans = new(TrainingCenterDatabase)
+	ans.Activity = append(ans.Activity, Activity{Sport: Biking})
+	ans.Activity[0].Id = log.GeneralInformation.FileDate.Time
+	ans.Activity[0].Lap = append(ans.Activity[0].Lap, ActivityLap{Intensity: Active, TriggerMethod: Manual})
+	ans.Activity[0].Lap[0].Track = append(ans.Activity[0].Lap[0].Track, Track{})
+
+	var t time.Time = log.GeneralInformation.StartDate.Time
+	var k float64 = 0
+
+	ans.Activity[0].Lap[0].StartTime = t
+
+	ans.Activity[0].Lap[0].MaximumSpeed = new(float64)
+
+	for _, entry := range log.LogEntry {
+		var p Trackpoint
+		p.Time = t
+		p.Altitude = new(float64)
+		*p.Altitude = (float64)(entry.Altitude) * 1.0E-3
+		p.Distance = new(float64)
+		*p.Distance = entry.Distance
+		if len(ans.Activity[0].Lap[0].Track[0].Trackpoint) > 0 {
+			*p.Distance += *ans.Activity[0].Lap[0].Track[0].Trackpoint[
+				len(ans.Activity[0].Lap[0].Track[0].Trackpoint) - 1].Distance
+		}
+		p.HeartRate = new(int)
+		*p.HeartRate = entry.Heartrate
+		p.Cadence = new(int)
+		*p.Cadence = entry.Cadence
+		if (entry.Speed * 3600.0 / 1000.0) > *ans.Activity[0].Lap[0].MaximumSpeed {
+			*ans.Activity[0].Lap[0].MaximumSpeed = (entry.Speed * 3600.0 / 1000.0)
+		}
+		k += entry.Calories
+		ans.Activity[0].Lap[0].Track[0].Trackpoint = append(ans.Activity[0].Lap[0].Track[0].Trackpoint, p)
+		t = t.Add((time.Duration)(entry.RideTime * (float64)(time.Second)))
+		ans.Activity[0].Lap[0].TotalTime += entry.RideTime
+	}
+	ans.Activity[0].Lap[0].Calories = (int)(k)
+	ans.Activity[0].Lap[0].Distance =
+		*ans.Activity[0].Lap[0].Track[0].Trackpoint[len(ans.Activity[0].Lap[0].Track[0].Trackpoint) - 1].Distance
+
+	return
 }
 
 func (t *TrainingCenterDatabase) ReplaceTrack(track *gpx.Gpx) error {
