@@ -65,12 +65,14 @@ func conv(wrk *slf.Log, ans *tcx.TrainingCenterDatabase) (err error) {
 		for nMarker := nMarkerBegin; nMarker < len(wrk.Marker); nMarker++ {
 			curMarker := &wrk.Marker[nMarker]
 			curMarkerTime := (time.Duration)(curMarker.TimeAbsolute) * time.Second
+			curMarkerDuration := (time.Duration)(curMarker.Duration) * time.Second
 			log.Printf("samplingTime %s, curMarker.TimeAbsolute %s\n",
 				samplingTime.String(), curMarkerTime.String())
 			if samplingTime >= curMarkerTime {
 				if curMarker.MarkerType == slf.Pause {
 					log.Printf("Pause at %f, duration %d\n", curMarker.DistanceAbsolute, curMarker.Duration)
-					clockTime = clockTime.Add((time.Duration)(curMarker.Duration) * time.Second)
+					clockTime = clockTime.Add(curMarkerDuration)
+					curLap.TotalTime += (float64)(curMarkerDuration / time.Second)
 					nMarkerBegin = nMarker + 1
 					break
 				} else if curMarker.MarkerType == slf.Lap {
@@ -88,6 +90,7 @@ func conv(wrk *slf.Log, ans *tcx.TrainingCenterDatabase) (err error) {
 
 		clockTime = clockTime.Add(advanceTime)
 		samplingTime += advanceTime
+		curLap.TotalTime += (float64)(advanceTime / time.Second)
 	}
 
 	if curLap != nil {
