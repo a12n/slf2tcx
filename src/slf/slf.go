@@ -3,6 +3,7 @@ package slf
 import (
 	"encoding/xml"
 	"errors"
+	"io"
 	"os"
 	"sort"
 	"time"
@@ -202,19 +203,23 @@ func (a byTimeAbsolute) Len() int { return len(a) }
 func (a byTimeAbsolute) Less(i, j int) bool { return a[i].TimeAbsolute < a[j].TimeAbsolute }
 func (a byTimeAbsolute) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-func Load(path string) (ans *Log, err error) {
-	// FIXME: duplicates gpx.Load
+func LoadFile(path string) (ans *Log, err error) {
 	var file *os.File
 	if file, err = os.Open(path); err == nil {
 		defer file.Close()
-		ans = new(Log)
-		if err = xml.NewDecoder(file).Decode(ans); err == nil {
-			if ans.GeneralInformation.LogType == Cycling {
-				sort.Sort(byNumber(ans.LogEntry))
-				sort.Sort(byTimeAbsolute(ans.Marker))
-			} else {
-				err = errors.New("non-cycling logs are unsupported");
-			}
+		return Load(file)
+	}
+	return
+}
+
+func Load(file io.Reader) (ans *Log, err error) {
+	ans = new(Log)
+	if err = xml.NewDecoder(file).Decode(ans); err == nil {
+		if ans.GeneralInformation.LogType == Cycling {
+			sort.Sort(byNumber(ans.LogEntry))
+			sort.Sort(byTimeAbsolute(ans.Marker))
+		} else {
+			err = errors.New("non-cycling logs are unsupported");
 		}
 	}
 	return
