@@ -2,6 +2,7 @@ package slf
 
 import (
 	"encoding/xml"
+	"errors"
 	"os"
 	"sort"
 	"time"
@@ -208,8 +209,12 @@ func Load(path string) (ans *Log, err error) {
 		defer file.Close()
 		ans = new(Log)
 		if err = xml.NewDecoder(file).Decode(ans); err == nil {
-			sort.Sort(byNumber(ans.LogEntry))
-			sort.Sort(byTimeAbsolute(ans.Marker))
+			if ans.GeneralInformation.LogType == Cycling {
+				sort.Sort(byNumber(ans.LogEntry))
+				sort.Sort(byTimeAbsolute(ans.Marker))
+			} else {
+				err = errors.New("non-cycling logs are unsupported");
+			}
 		}
 	}
 	return
