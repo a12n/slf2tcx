@@ -2,10 +2,7 @@ package tcx
 
 import (
 	"encoding/xml"
-	"gpx"
-	"log"
 	"os"
-	"slf"
 	"time"
 )
 
@@ -88,130 +85,6 @@ type TrainingCenterDatabase struct {
 // 	}
 // 	return ans, nil
 // }
-
-func FromLog(wrk *slf.Log) (ans *TrainingCenterDatabase, err error) {
-	ans = new(TrainingCenterDatabase)
-
-	var activity Activity = Activity{Id: wrk.GeneralInformation.FileDate.Time, Sport: Biking}
-
-	var lap *ActivityLap
-	var t time.Time = wrk.GeneralInformation.StartDate.Time
-	var t2 time.Time = wrk.GeneralInformation.StartDate.Time
-
-	var m int = 0
-
-	for k, entry := range wrk.LogEntry {
-		log.Printf("entry %d\n", k)
-
-		if lap == nil {
-			lap = new(ActivityLap)
-			*lap = ActivityLap{StartTime: t, Track: make([]Track, 1)}
-		}
-
-		var point Trackpoint
-
-		point.Time = t
-
-		point.Altitude = new(float64)
-		*point.Altitude = (float64)(entry.Altitude) * 1.0E-3
-
-		point.Distance = new(float64)
-		*point.Distance = entry.Distance
-
-		if len(lap.Track[0].Trackpoint) > 0 {
-			*point.Distance += *lap.Track[0].Trackpoint[len(lap.Track[0].Trackpoint) - 1].Distance
-		}
-
-		point.HeartRate = new(int)
-		*point.HeartRate = entry.Heartrate
-
-		point.Cadence = new(int)
-		*point.Cadence = entry.Cadence
-
-		lap.Track[0].Trackpoint = append(lap.Track[0].Trackpoint, point)
-
-		t = t.Add((time.Duration)(wrk.GeneralInformation.SamplingRate * (float64)(time.Second)))
-		lap.TotalTime += wrk.GeneralInformation.SamplingRate
-
-		for i := m; i < len(wrk.Marker); i++ {
-			// log.Printf("wrk.Marker[%d] %#v\n", i, wrk.Marker[i])
-			tm := wrk.GeneralInformation.StartDate.Time.Add((time.Duration)(wrk.Marker[i].TimeAbsolute) * time.Second)
-			log.Printf("t %v, t2 %v, tm[%d] %v\n", t, t2, i, tm)
-			if t2.After(tm) {
-			// log.Printf("point.Distance %f, wrk.Marker[%d].DistanceAbsolute %f\n",
-			// 	*point.Distance, i, wrk.Marker[i].DistanceAbsolute)
-			// if *point.Distance >= wrk.Marker[i].DistanceAbsolute {
-				if wrk.Marker[i].MarkerType == slf.Lap {
-					// lap.TotalTime = (float64)(wrk.Marker[i].Time)
-					lap.Distance = wrk.Marker[i].Distance
-					lap.MaximumSpeed = new(float64)
-					*lap.MaximumSpeed = wrk.Marker[i].MaximumSpeed * 3600.0 / 1000.0
-					lap.Calories = (int)(wrk.Marker[i].Calories)
-					lap.AverageHeartRate = new(int)
-					*lap.AverageHeartRate = wrk.Marker[i].AverageHeartrate
-					lap.MaximumHeartRate = new(int)
-					*lap.MaximumHeartRate = wrk.Marker[i].MaximumHeartrate
-					lap.Intensity = Active
-					lap.Cadence = new(int)
-					*lap.Cadence = wrk.Marker[i].AverageCadence
-					lap.TriggerMethod = Manual
-					log.Printf("Append lap\n")
-					activity.Lap = append(activity.Lap, *lap)
-					lap = nil
-				} else if wrk.Marker[i].MarkerType == slf.Pause {
-					log.Printf("Pause at %f, duration %d\n", wrk.Marker[i].DistanceAbsolute, wrk.Marker[i].Duration)
-					t = t.Add((time.Duration)(wrk.Marker[i].Duration) * time.Second)
-				}
-				m = i + 1
-				break
-			}
-		}
-
-		t2 = t2.Add((time.Duration)(wrk.GeneralInformation.SamplingRate * (float64)(time.Second)))
-	}
-
-	// if lap != nil {
-	// 	log.Printf("Append lap\n")
-	// 	activity.Lap = append(activity.Lap, *lap)
-	// 	lap = nil
-	// }
-
-	ans.Activity = append(ans.Activity, activity)
-
-	return
-}
-
-func lerp(t, a, b float64) float64 {
-	return (1.0 - t) * a + t * b
-}
-
-func (self *TrainingCenterDatabase) ReplaceTrack(track *gpx.Gpx) error {
-	k := 0
-	for iLap, lap := range self.Activity[0].Lap {
-		for iTrackpoint, point := range lap.Track[0].Trackpoint {
-			m := -1
-			for i := k; i < len(track.Trk[0].TrkSeg[0].TrkPt); i++ {
-				// log.Printf("TrkPt[%d] %#v\n", i, track.Trk[0].TrkSeg[0].TrkPt[i])
-				if point.Time.Before(*track.Trk[0].TrkSeg[0].TrkPt[i].Time) {
-					m = i
-					break
-				}
-			}
-			if m > 0 {
-				q1 := track.Trk[0].TrkSeg[0].TrkPt[m - 1]
-				q2 := track.Trk[0].TrkSeg[0].TrkPt[m]
-				dq := q2.Time.Sub(*q1.Time)
-				dp := point.Time.Sub(*q1.Time)
-				t := (float64)(dp) / (float64)(dq)
-				log.Printf("dq %d, dp %d, t %f\n", dq, dp, t)
-				self.Activity[0].Lap[iLap].Track[0].Trackpoint[iTrackpoint].Position = new(Position)
-				self.Activity[0].Lap[iLap].Track[0].Trackpoint[iTrackpoint].Position.Latitude = lerp(t, q1.Lat, q2.Lat)
-				self.Activity[0].Lap[iLap].Track[0].Trackpoint[iTrackpoint].Position.Longitude = lerp(t, q1.Lon, q2.Lon)
-			}
-		}
-	}
-	return nil
-}
 
 func (t *TrainingCenterDatabase) SaveFile(path string) (err error) {
 	var file *os.File
