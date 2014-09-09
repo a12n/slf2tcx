@@ -130,9 +130,8 @@ func FromLog(wrk *slf.Log) (ans *TrainingCenterDatabase, err error) {
 
 		lap.Track[0].Trackpoint = append(lap.Track[0].Trackpoint, point)
 
-		t = t.Add((time.Duration)(entry.RideTime * (float64)(time.Second)))
-		t2 = t2.Add((time.Duration)(entry.RideTime * (float64)(time.Second)))
-		lap.TotalTime += entry.RideTime
+		t = t.Add((time.Duration)(wrk.GeneralInformation.SamplingRate * (float64)(time.Second)))
+		lap.TotalTime += wrk.GeneralInformation.SamplingRate
 
 		for i := m; i < len(wrk.Marker); i++ {
 			// log.Printf("wrk.Marker[%d] %#v\n", i, wrk.Marker[i])
@@ -167,6 +166,8 @@ func FromLog(wrk *slf.Log) (ans *TrainingCenterDatabase, err error) {
 				break
 			}
 		}
+
+		t2 = t2.Add((time.Duration)(wrk.GeneralInformation.SamplingRate * (float64)(time.Second)))
 	}
 
 	// if lap != nil {
