@@ -35,9 +35,7 @@ func conv(wrk *slf.Log, ans *tcx.TrainingCenterDatabase) (err error) {
 
 		if curLap == nil {
 			curLap = new(tcx.ActivityLap)
-			*curLap = tcx.ActivityLap{Intensity: tcx.Active,
-				StartTime: clockTime, Track: make([]tcx.Track, 1),
-				TriggerMethod: tcx.Manual}
+			*curLap = tcx.ActivityLap{StartTime: clockTime, Track: make([]tcx.Track, 1)}
 			curTrack = &curLap.Track[0]
 		}
 
@@ -76,7 +74,6 @@ func conv(wrk *slf.Log, ans *tcx.TrainingCenterDatabase) (err error) {
 					nMarkerBegin = nMarker + 1
 					break
 				} else if curMarker.MarkerType == slf.Lap {
-					log.Printf("New lap!\n")
 					// TODO: new lap, start time = (wrk.GeneralInformation.StartDate + Marker.TimeAbsolute)
 					// Trackpoint was already appended, move it to the new lap.
 				}
@@ -93,9 +90,33 @@ func conv(wrk *slf.Log, ans *tcx.TrainingCenterDatabase) (err error) {
 		curLap.TotalTime += (float64)(advanceTime / time.Second)
 	}
 
-	if curLap != nil {
-		log.Printf("Append lap\n")
-		curActivity.Lap = append(curActivity.Lap, *curLap)
+	// XXX: Close and append lap if there is no more log entries and
+	// an unhandled lap marker.
+	if nMarkerBegin == (len(wrk.Marker) - 1) {
+		log.Printf("nMarkerBegin %d, len(wrk.Marker) %d\n",
+			nMarkerBegin, len(wrk.Marker))
+		for nMarker := nMarkerBegin; nMarker < len(wrk.Marker); nMarker++ {
+			curMarker := &wrk.Marker[nMarker]
+			if curMarker.MarkerType == slf.Lap {
+				// Fill lap summary
+				curLap.Distance = curMarker.DistanceAbsolute
+				curLap.MaximumSpeed = new(float64)
+				*curLap.MaximumSpeed = mps2kmph(curMarker.MaximumSpeed)
+				curLap.Calories = (int)(curMarker.Calories)
+				curLap.AverageHeartRate = new(int)
+				*curLap.AverageHeartRate = curMarker.AverageHeartRate
+				curLap.MaximumHeartRate = new(int)
+				*curLap.MaximumHeartRate = curMarker.MaximumHeartRate
+				curLap.Intensity = tcx.Active
+				curLap.Cadence = new(int)
+				*curLap.Cadence = curMarker.AverageCadence
+				curLap.TriggerMethod = tcx.Manual
+				// Append lap
+				curActivity.Lap = append(curActivity.Lap, *curLap)
+				curLap = nil
+				break
+			}
+		}
 	}
 
 	ans.Activity = append(ans.Activity, curActivity)
