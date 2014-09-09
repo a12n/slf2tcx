@@ -22,7 +22,7 @@ type Wpt struct {
 	Lat float64 `xml:"lat,attr"`
 	Lon float64 `xml:"lon,attr"`
 	Ele *float64 `xml:"ele"`
-	Time *time.Time `xml"time"`
+	Time *time.Time `xml:"time"`
 	// MagVar *float64 `xml"magvar"`
 	// GeoidHeight *float64 `xml"geoidheight"`
 	Name string `xml:"name,omitempty"`
