@@ -3,6 +3,7 @@ package tcx
 import (
 	"encoding/xml"
 	"gpx"
+	"log"
 	"os"
 	"slf"
 	"time"
@@ -88,46 +89,76 @@ type TrainingCenterDatabase struct {
 // 	return ans, nil
 // }
 
-func FromLog(log *slf.Log) (ans *TrainingCenterDatabase, err error) {
+func FromLog(wrk *slf.Log) (ans *TrainingCenterDatabase, err error) {
 	ans = new(TrainingCenterDatabase)
-	ans.Activity = append(ans.Activity, Activity{Sport: Biking})
-	ans.Activity[0].Id = log.GeneralInformation.FileDate.Time
-	ans.Activity[0].Lap = append(ans.Activity[0].Lap, ActivityLap{Intensity: Active, TriggerMethod: Manual})
-	ans.Activity[0].Lap[0].Track = append(ans.Activity[0].Lap[0].Track, Track{})
 
-	var t time.Time = log.GeneralInformation.StartDate.Time
-	var k float64 = 0
+	var activity Activity = Activity{Id: wrk.GeneralInformation.FileDate.Time, Sport: Biking}
 
-	ans.Activity[0].Lap[0].StartTime = t
+	var lap *ActivityLap
+	var t time.Time = wrk.GeneralInformation.StartDate.Time
+	var kcal float64 = 0
 
-	ans.Activity[0].Lap[0].MaximumSpeed = new(float64)
+	var m int = 0
 
-	for _, entry := range log.LogEntry {
-		var p Trackpoint
-		p.Time = t
-		p.Altitude = new(float64)
-		*p.Altitude = (float64)(entry.Altitude) * 1.0E-3
-		p.Distance = new(float64)
-		*p.Distance = entry.Distance
-		if len(ans.Activity[0].Lap[0].Track[0].Trackpoint) > 0 {
-			*p.Distance += *ans.Activity[0].Lap[0].Track[0].Trackpoint[
-				len(ans.Activity[0].Lap[0].Track[0].Trackpoint) - 1].Distance
+	for _, entry := range wrk.LogEntry {
+		if lap == nil {
+			lap = new(ActivityLap)
+			*lap = ActivityLap{Intensity: Active, MaximumSpeed:
+				new(float64), StartTime: t, Track: make([]Track, 1),
+				TriggerMethod: Manual}
 		}
-		p.HeartRate = new(int)
-		*p.HeartRate = entry.Heartrate
-		p.Cadence = new(int)
-		*p.Cadence = entry.Cadence
-		if (entry.Speed * 3600.0 / 1000.0) > *ans.Activity[0].Lap[0].MaximumSpeed {
-			*ans.Activity[0].Lap[0].MaximumSpeed = (entry.Speed * 3600.0 / 1000.0)
+
+		var point Trackpoint
+
+		point.Time = t
+
+		point.Altitude = new(float64)
+		*point.Altitude = (float64)(entry.Altitude) * 1.0E-3
+
+		point.Distance = new(float64)
+		*point.Distance = entry.Distance
+
+		if len(lap.Track[0].Trackpoint) > 0 {
+			*point.Distance += *lap.Track[0].Trackpoint[len(lap.Track[0].Trackpoint) - 1].Distance
 		}
-		k += entry.Calories
-		ans.Activity[0].Lap[0].Track[0].Trackpoint = append(ans.Activity[0].Lap[0].Track[0].Trackpoint, p)
+
+		point.HeartRate = new(int)
+		*point.HeartRate = entry.Heartrate
+
+		point.Cadence = new(int)
+		*point.Cadence = entry.Cadence
+
+		if v := (entry.Speed * 3600.0 / 1000.0); v > *lap.MaximumSpeed {
+			*lap.MaximumSpeed = v
+		}
+
+		kcal += entry.Calories
+
+		lap.Track[0].Trackpoint = append(lap.Track[0].Trackpoint, point)
+
+		lap.TotalTime += entry.RideTime
 		t = t.Add((time.Duration)(entry.RideTime * (float64)(time.Second)))
-		ans.Activity[0].Lap[0].TotalTime += entry.RideTime
+
+		for i := m; i < len(wrk.Marker); i++ {
+			tm := wrk.GeneralInformation.StartDate.Time.Add((time.Duration)(wrk.Marker[i].TimeAbsolute) * time.Second)
+			if t.After(tm) {
+				if wrk.Marker[i].MarkerType == slf.Pause {
+					log.Printf("Pause at %f, duration %d\n", wrk.Marker[i].DistanceAbsolute, wrk.Marker[i].Duration)
+					t = t.Add((time.Duration)(wrk.Marker[i].Duration) * time.Second)
+					lap.TotalTime += (float64)(wrk.Marker[i].Duration)
+				}
+				m = i + 1
+				break
+			}
+		}
 	}
-	ans.Activity[0].Lap[0].Calories = (int)(k)
-	ans.Activity[0].Lap[0].Distance =
-		*ans.Activity[0].Lap[0].Track[0].Trackpoint[len(ans.Activity[0].Lap[0].Track[0].Trackpoint) - 1].Distance
+	lap.Calories = (int)(kcal)
+	lap.Distance = *lap.Track[0].Trackpoint[len(lap.Track[0].Trackpoint) - 1].Distance
+
+	if lap != nil {
+		activity.Lap = append(activity.Lap, *lap)
+	}
+	ans.Activity = append(ans.Activity, activity)
 
 	return
 }
