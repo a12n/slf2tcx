@@ -213,12 +213,19 @@ func (self *TrainingCenterDatabase) ReplaceTrack(track *gpx.Gpx) error {
 	return nil
 }
 
-func (t *TrainingCenterDatabase) Save(path string) (err error) {
+func (t *TrainingCenterDatabase) SaveFile(path string) (err error) {
 	var file *os.File
 	if file, err = os.Create(path); err == nil {
 		defer file.Close()
-		var encoder *xml.Encoder = xml.NewEncoder(file)
-		encoder.Indent("", "\t")
+		err = t.Save(file)
+	}
+	return
+}
+
+func (t *TrainingCenterDatabase) Save(file *os.File) (err error) {
+	var encoder *xml.Encoder = xml.NewEncoder(file)
+	encoder.Indent("", "\t")
+	if _, err = file.WriteString(xml.Header); err == nil {
 		err = encoder.Encode(t)
 	}
 	return
