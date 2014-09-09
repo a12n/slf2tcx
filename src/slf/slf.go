@@ -3,7 +3,6 @@ package slf
 import (
 	"encoding/xml"
 	"errors"
-	"io"
 	"os"
 	"sort"
 	"time"
@@ -212,7 +211,7 @@ func LoadFile(path string) (ans *Log, err error) {
 	return
 }
 
-func Load(file io.Reader) (ans *Log, err error) {
+func Load(file *os.File) (ans *Log, err error) {
 	ans = new(Log)
 	if err = xml.NewDecoder(file).Decode(ans); err == nil {
 		if ans.GeneralInformation.LogType == Cycling {
