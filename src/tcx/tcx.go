@@ -181,8 +181,35 @@ func FromLog(wrk *slf.Log) (ans *TrainingCenterDatabase, err error) {
 	return
 }
 
-func (t *TrainingCenterDatabase) ReplaceTrack(track *gpx.Gpx) error {
-	// TODO
+func lerp(t, a, b float64) float64 {
+	return (1.0 - t) * a + t * b
+}
+
+func (self *TrainingCenterDatabase) ReplaceTrack(track *gpx.Gpx) error {
+	k := 0
+	for iLap, lap := range self.Activity[0].Lap {
+		for iTrackpoint, point := range lap.Track[0].Trackpoint {
+			m := -1
+			for i := k; i < len(track.Trk[0].TrkSeg[0].TrkPt); i++ {
+				// log.Printf("TrkPt[%d] %#v\n", i, track.Trk[0].TrkSeg[0].TrkPt[i])
+				if point.Time.Before(*track.Trk[0].TrkSeg[0].TrkPt[i].Time) {
+					m = i
+					break
+				}
+			}
+			if m > 0 {
+				q1 := track.Trk[0].TrkSeg[0].TrkPt[m - 1]
+				q2 := track.Trk[0].TrkSeg[0].TrkPt[m]
+				dq := q2.Time.Sub(*q1.Time)
+				dp := point.Time.Sub(*q1.Time)
+				t := (float64)(dp) / (float64)(dq)
+				log.Printf("dq %d, dp %d, t %f\n", dq, dp, t)
+				self.Activity[0].Lap[iLap].Track[0].Trackpoint[iTrackpoint].Position = new(Position)
+				self.Activity[0].Lap[iLap].Track[0].Trackpoint[iTrackpoint].Position.Latitude = lerp(t, q1.Lat, q2.Lat)
+				self.Activity[0].Lap[iLap].Track[0].Trackpoint[iTrackpoint].Position.Longitude = lerp(t, q1.Lon, q2.Lon)
+			}
+		}
+	}
 	return nil
 }
 
