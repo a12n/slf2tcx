@@ -104,7 +104,7 @@ type LogEntry struct {
 	Number int
 	Rotations int				// rpm?
 	Speed float64				// m/s
-	Heartrate int				// bpm
+	HeartRate int				// bpm
 	Altitude float64			// mm
 	Temperature float64			// °C
 	RideTime float64			// s
@@ -131,7 +131,7 @@ type LogValues struct {
 	HrMax int					// bpm
 	LowerLimit int				// bpm?
 	UpperLimit int				// bpm?
-	AverageHeartrate int		// bpm
+	AverageHeartRate int		// bpm
 	Calories float64			// kcal
 	CaloriesDifferenceFactor float64 // ?
 	IntensityZone1Start int		  // bpm
@@ -169,9 +169,9 @@ type Marker struct {
 	Duration int				// s?
 	Distance float64			// m?
 	DistanceAbsolute float64	// m?
-	MinimumHeartrate int		// bpm?
-	MaximumHeartrate int		// bpm?
-	AverageHeartrate int		// bpm?
+	MinimumHeartRate int		// bpm?
+	MaximumHeartRate int		// bpm?
+	AverageHeartRate int		// bpm?
 	Calories float64			// kcal?
 	MinimumSpeed float64		// m/s?
 	MaximumSpeed float64		// m/s?
