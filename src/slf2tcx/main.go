@@ -35,7 +35,9 @@ func conv(wrk *slf.Log, ans *tcx.TrainingCenterDatabase) (err error) {
 
 		if curLap == nil {
 			curLap = new(tcx.ActivityLap)
-			*curLap = tcx.ActivityLap{StartTime: clockTime, Track: make([]tcx.Track, 1)}
+			*curLap = tcx.ActivityLap{Intensity: tcx.Active,
+				StartTime: clockTime, Track: make([]tcx.Track, 1),
+				TriggerMethod: tcx.Manual}
 			curTrack = &curLap.Track[0]
 		}
 
