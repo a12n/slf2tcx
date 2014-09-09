@@ -96,16 +96,16 @@ func FromLog(wrk *slf.Log) (ans *TrainingCenterDatabase, err error) {
 
 	var lap *ActivityLap
 	var t time.Time = wrk.GeneralInformation.StartDate.Time
-	var kcal float64 = 0
+	var t2 time.Time = wrk.GeneralInformation.StartDate.Time
 
 	var m int = 0
 
-	for _, entry := range wrk.LogEntry {
+	for k, entry := range wrk.LogEntry {
+		log.Printf("entry %d\n", k)
+
 		if lap == nil {
 			lap = new(ActivityLap)
-			*lap = ActivityLap{Intensity: Active, MaximumSpeed:
-				new(float64), StartTime: t, Track: make([]Track, 1),
-				TriggerMethod: Manual}
+			*lap = ActivityLap{StartTime: t, Track: make([]Track, 1)}
 		}
 
 		var point Trackpoint
@@ -128,36 +128,53 @@ func FromLog(wrk *slf.Log) (ans *TrainingCenterDatabase, err error) {
 		point.Cadence = new(int)
 		*point.Cadence = entry.Cadence
 
-		if v := (entry.Speed * 3600.0 / 1000.0); v > *lap.MaximumSpeed {
-			*lap.MaximumSpeed = v
-		}
-
-		kcal += entry.Calories
-
 		lap.Track[0].Trackpoint = append(lap.Track[0].Trackpoint, point)
 
-		lap.TotalTime += entry.RideTime
 		t = t.Add((time.Duration)(entry.RideTime * (float64)(time.Second)))
+		t2 = t2.Add((time.Duration)(entry.RideTime * (float64)(time.Second)))
+		lap.TotalTime += entry.RideTime
 
 		for i := m; i < len(wrk.Marker); i++ {
+			// log.Printf("wrk.Marker[%d] %#v\n", i, wrk.Marker[i])
 			tm := wrk.GeneralInformation.StartDate.Time.Add((time.Duration)(wrk.Marker[i].TimeAbsolute) * time.Second)
-			if t.After(tm) {
-				if wrk.Marker[i].MarkerType == slf.Pause {
+			log.Printf("t %v, t2 %v, tm[%d] %v\n", t, t2, i, tm)
+			if t2.After(tm) {
+			// log.Printf("point.Distance %f, wrk.Marker[%d].DistanceAbsolute %f\n",
+			// 	*point.Distance, i, wrk.Marker[i].DistanceAbsolute)
+			// if *point.Distance >= wrk.Marker[i].DistanceAbsolute {
+				if wrk.Marker[i].MarkerType == slf.Lap {
+					// lap.TotalTime = (float64)(wrk.Marker[i].Time)
+					lap.Distance = wrk.Marker[i].Distance
+					lap.MaximumSpeed = new(float64)
+					*lap.MaximumSpeed = wrk.Marker[i].MaximumSpeed * 3600.0 / 1000.0
+					lap.Calories = (int)(wrk.Marker[i].Calories)
+					lap.AverageHeartRate = new(int)
+					*lap.AverageHeartRate = wrk.Marker[i].AverageHeartrate
+					lap.MaximumHeartRate = new(int)
+					*lap.MaximumHeartRate = wrk.Marker[i].MaximumHeartrate
+					lap.Intensity = Active
+					lap.Cadence = new(int)
+					*lap.Cadence = wrk.Marker[i].AverageCadence
+					lap.TriggerMethod = Manual
+					log.Printf("Append lap\n")
+					activity.Lap = append(activity.Lap, *lap)
+					lap = nil
+				} else if wrk.Marker[i].MarkerType == slf.Pause {
 					log.Printf("Pause at %f, duration %d\n", wrk.Marker[i].DistanceAbsolute, wrk.Marker[i].Duration)
 					t = t.Add((time.Duration)(wrk.Marker[i].Duration) * time.Second)
-					lap.TotalTime += (float64)(wrk.Marker[i].Duration)
 				}
 				m = i + 1
 				break
 			}
 		}
 	}
-	lap.Calories = (int)(kcal)
-	lap.Distance = *lap.Track[0].Trackpoint[len(lap.Track[0].Trackpoint) - 1].Distance
 
-	if lap != nil {
-		activity.Lap = append(activity.Lap, *lap)
-	}
+	// if lap != nil {
+	// 	log.Printf("Append lap\n")
+	// 	activity.Lap = append(activity.Lap, *lap)
+	// 	lap = nil
+	// }
+
 	ans.Activity = append(ans.Activity, activity)
 
 	return
