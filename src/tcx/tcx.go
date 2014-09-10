@@ -70,21 +70,13 @@ type TrainingCenterDatabase struct {
 	Activity []Activity `xml:"Activities>Activity"`
 }
 
-// func Load(path string) (*TrainingCenterDatabase, error) {
-// 	var err error
-// 	var file *os.File
-// 	if file, err = os.Open(path); err != nil {
-// 		return nil, err
-// 	}
-// 	defer file.Close()
-// 	var ans *TrainingCenterDatabase = new(TrainingCenterDatabase)
-// 	var decoder *xml.Decoder = xml.NewDecoder(file)
-// 	decoder.DefaultSpace = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"
-// 	if err = decoder.Decode(ans); err != nil {
-// 		return nil, err
-// 	}
-// 	return ans, nil
-// }
+func Load(file *os.File) (ans *TrainingCenterDatabase, err error) {
+	ans = new(TrainingCenterDatabase)
+	var decoder *xml.Decoder = xml.NewDecoder(file)
+	decoder.DefaultSpace = "http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"
+	err = decoder.Decode(ans)
+	return
+}
 
 func (t *TrainingCenterDatabase) SaveFile(path string) (err error) {
 	var file *os.File
