@@ -81,17 +81,21 @@ func (a byTime) Len() int { return len(a) }
 func (a byTime) Less(i, j int) bool { return (a[i].Time != nil && a[j].Time != nil) && a[i].Time.Before(*a[j].Time) }
 func (a byTime) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-func Load(path string) (ans *Gpx, err error) {
-	// FIXME: duplicates slf.Load
+func LoadFile(path string) (ans *Gpx, err error) {
 	var file *os.File
 	if file, err = os.Open(path); err == nil {
 		defer file.Close()
-		ans = new(Gpx)
-		if err = xml.NewDecoder(file).Decode(ans); err == nil {
-			for _, trk := range ans.Trk {
-				for _, trkSeg := range trk.TrkSeg {
-					sort.Sort(byTime(trkSeg.TrkPt))
-				}
+		return Load(file)
+	}
+	return
+}
+
+func Load(file *os.File) (ans *Gpx, err error) {
+	ans = new(Gpx)
+	if err = xml.NewDecoder(file).Decode(ans); err == nil {
+		for _, trk := range ans.Trk {
+			for _, trkSeg := range trk.TrkSeg {
+				sort.Sort(byTime(trkSeg.TrkPt))
 			}
 		}
 	}
