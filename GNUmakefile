@@ -1,4 +1,4 @@
-VSN = 0.1
+VSN = 0.8
 BIN = slf2tcx
 REL = $(BIN)-$(GOHOSTOS)-$(GOHOSTARCH)-$(VSN)
 SRCS = gpx.go main.go slf.go tcx.go
