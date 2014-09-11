@@ -1,26 +1,19 @@
 VSN = 0.8
-BIN = slf2tcx
-REL = $(BIN)-$(GOHOSTOS)-$(GOHOSTARCH)-$(VSN)
-SRCS = gpx.go main.go slf.go tcx.go
 
 GOHOSTARCH = $(shell go env GOHOSTARCH)
 GOHOSTOS = $(shell go env GOHOSTOS)
 
-.PHONY: all clean distclean rel
+.PHONY: all clean
 
-all: $(BIN)
+all:
+	GOPATH=$(realpath .) go install slf2tcx tcx+gpx
 
 clean:
-	rm -f $(BIN)
-
-distclean: clean
-	rm -f $(REL)
-
-rel: $(REL)
-
-$(BIN): $(SRCS)
-	go build -o $@ $^
-
-$(REL): $(BIN)
-	cp $< $@
-	strip $@
+	for f in slf2tcx tcx+gpx; do \
+		rm -f bin/$$f; \
+	done
+	for f in gpx.a slf.a tcx.a; do \
+		rm -f pkg/$(GOHOSTOS)_$(GOHOSTARCH)/$$f; \
+	done
+	-rmdir bin/
+	-rmdir pkg/$(GOHOSTOS)_$(GOHOSTARCH) pkg/
