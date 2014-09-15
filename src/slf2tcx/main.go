@@ -74,8 +74,32 @@ func conv(wrk *slf.Log, ans *tcx.TrainingCenterDatabase) (err error) {
 					nMarkerBegin = nMarker + 1
 					break
 				} else if curMarker.MarkerType == slf.Lap {
-					// TODO: new lap, start time = (wrk.GeneralInformation.StartDate + Marker.TimeAbsolute)
+					log.Printf("Lap at %f\n", curMarker.DistanceAbsolute)
+					// Fill lap summary
+					curLap.Distance = curMarker.Distance
+					curLap.MaximumSpeed = new(float64)
+					*curLap.MaximumSpeed = mps2kmph(curMarker.MaximumSpeed)
+					curLap.Calories = (int)(curMarker.Calories)
+					curLap.AverageHeartRate = new(int)
+					*curLap.AverageHeartRate = curMarker.AverageHeartRate
+					curLap.MaximumHeartRate = new(int)
+					*curLap.MaximumHeartRate = curMarker.MaximumHeartRate
+					curLap.Intensity = tcx.Active
+					curLap.Cadence = new(int)
+					*curLap.Cadence = curMarker.AverageCadence
+					curLap.TriggerMethod = tcx.Manual
+					// Append lap
+					curActivity.Lap = append(curActivity.Lap, *curLap)
+					// Create new lap
+					curLap = new(tcx.ActivityLap)
+					*curLap = tcx.ActivityLap{Track: make([]tcx.Track, 1)}
+					curLap.StartTime = wrk.GeneralInformation.StartDate.Time.Add((time.Duration)(curMarker.TimeAbsolute) * time.Second)
 					// Trackpoint was already appended, move it to the new lap.
+					curTrack.Trackpoint = curTrack.Trackpoint[:(len(curTrack.Trackpoint) - 1)]
+					curTrack = &curLap.Track[0]
+					curTrack.Trackpoint = append(curTrack.Trackpoint, curTrackpoint)
+					nMarkerBegin = nMarker + 1
+					break
 				}
 			}
 		}
