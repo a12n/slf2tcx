@@ -99,7 +99,7 @@ func conv(wrk *slf.Log, ans *tcx.TrainingCenterDatabase) (err error) {
 			curMarker := &wrk.Marker[nMarker]
 			if curMarker.MarkerType == slf.Lap {
 				// Fill lap summary
-				curLap.Distance = curMarker.DistanceAbsolute
+				curLap.Distance = curMarker.Distance
 				curLap.MaximumSpeed = new(float64)
 				*curLap.MaximumSpeed = mps2kmph(curMarker.MaximumSpeed)
 				curLap.Calories = (int)(curMarker.Calories)
