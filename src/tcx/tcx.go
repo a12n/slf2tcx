@@ -36,7 +36,7 @@ type Trackpoint struct {
 	Altitude *float64 `xml:"AltitudeMeters,omitempty"`
 	Distance *float64 `xml:"DistanceMeters,omitempty"`
 	HeartRate *int `xml:"HeartRateBpm>Value,omitempty"`
-	Cadence *int `xml:",omitempty"`
+	Cadence *int
 	SensorState string `xml:",omitempty"`
 }
 
