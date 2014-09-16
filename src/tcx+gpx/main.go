@@ -15,30 +15,34 @@ func lerp(t, a, b float64) float64 {
 func merge(wrk *tcx.TrainingCenterDatabase, trk *gpx.Gpx) (ans *tcx.TrainingCenterDatabase) {
 	ans = new(tcx.TrainingCenterDatabase)
 	*ans = *wrk
-	k := 0
-	for nLap, lap := range wrk.Activity[0].Lap {
-		for nWrkPt, wrkPt := range lap.Track[0].Trackpoint {
-			m := -1
-			for i := k; i < len(trk.Trk[0].TrkSeg[0].TrkPt); i++ {
-				// log.Printf("TrkPt[%d] %#v\n", i, track.Trk[0].TrkSeg[0].TrkPt[i])
-				if wrkPt.Time.Before(*trk.Trk[0].TrkSeg[0].TrkPt[i].Time) {
-					m = i
-					break
-				}
+	// Remove trackpoints from ans
+	for nLap, _ := range ans.Activity[0].Lap {
+		ans.Activity[0].Lap[nLap].Track[0].Trackpoint = make([]tcx.Trackpoint, 0)
+	}
+	// Create trackpoints with position and elevation
+	nLap := 0
+	for _, trkPt := range trk.Trk[0].TrkSeg[0].TrkPt {
+		if nLap < (len(ans.Activity[0].Lap) - 1) {
+			if ! trkPt.Time.Before(ans.Activity[0].Lap[nLap + 1].StartTime) {
+				nLap++
 			}
-			if m > 0 {
-				q1 := trk.Trk[0].TrkSeg[0].TrkPt[m - 1]
-				q2 := trk.Trk[0].TrkSeg[0].TrkPt[m]
-				dq := q2.Time.Sub(*q1.Time)
-				dp := wrkPt.Time.Sub(*q1.Time)
-				t := (float64)(dp) / (float64)(dq)
-				// log.Printf("dq %d, dp %d, t %f\n", dq, dp, t)
-				ans.Activity[0].Lap[nLap].Track[0].Trackpoint[nWrkPt].Position = new(tcx.Position)
-				ans.Activity[0].Lap[nLap].Track[0].Trackpoint[nWrkPt].Position.Latitude = lerp(t, q1.Lat, q2.Lat)
-				ans.Activity[0].Lap[nLap].Track[0].Trackpoint[nWrkPt].Position.Longitude = lerp(t, q1.Lon, q2.Lon)
-				ans.Activity[0].Lap[nLap].Track[0].Trackpoint[nWrkPt].Altitude = new(float64)
-				*ans.Activity[0].Lap[nLap].Track[0].Trackpoint[nWrkPt].Altitude = lerp(t, *q1.Ele, *q2.Ele)
-			}
+		}
+		if ! trkPt.Time.Before(ans.Activity[0].Lap[nLap].StartTime) {
+			newTrackpoint := tcx.Trackpoint{}
+			newTrackpoint.Time = *trkPt.Time
+			newTrackpoint.Position = new(tcx.Position)
+			newTrackpoint.Position.Latitude = trkPt.Lat
+			newTrackpoint.Position.Longitude = trkPt.Lon
+			newTrackpoint.Altitude = new(float64)
+			*newTrackpoint.Altitude = *trkPt.Ele
+			ans.Activity[0].Lap[nLap].Track[0].Trackpoint =
+				append(ans.Activity[0].Lap[nLap].Track[0].Trackpoint, newTrackpoint)
+		}
+	}
+	// Sample original TCX for heart rate and cadence
+	for nLap, _ := range ans.Activity[0].Lap {
+		for nTrackpoint, trackpoint := range lap.Track[0].Trackpoint {
+			// TODO
 		}
 	}
 	return
